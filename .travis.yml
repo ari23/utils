@@ -62,7 +62,7 @@ jobs:
               fi
     - name: packer-ansible
       script: |
-              make -f docker.mk packer-ansible
+              make -f docker.mk build-packer-ansible
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
                 make -f docker.mk push-packer-ansible
               fi
