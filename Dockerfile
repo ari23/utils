@@ -92,6 +92,7 @@ RUN install_packages \
   && cargo install hyperfine \
   && cargo install ripgrep \
   && cargo install sccache \
+  && RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install -f cargo-tarpaulin \
   && rm -rf /root/.cargo/registry
 
 ENV RUSTC_WRAPPER=sccache
