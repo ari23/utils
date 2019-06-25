@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # All Vagrant configuration is done here. The most common configuration
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at https://docs.vagrantup.com.
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/bionic64"
   config.disksize.size = "30GB"
 
   # e.g. for wireshark forwarding
@@ -48,8 +48,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Setup the VM for DPDK, including binding the extra interface via the fetched
   # container
-  config.vm.provision "shell", path: "#{$scripts_dir}/vm-kernel-upgrade.sh"
-  config.vm.provision "reload"
   config.vm.provision "shell", path: "#{$scripts_dir}/vm-setup.sh"
   config.vm.provision "shell", path: "#{$scripts_dir}/containernet-setup.sh", args: ["#{$submod_dir}"]
 
@@ -71,7 +69,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # VirtualBox-specific configuration
   config.vm.provider "virtualbox" do |vb|
     # Set machine name, memory and CPU limits
-    vb.name = "ubuntu-xenial-williamofockham"
+    vb.name = "ubuntu-bionic-williamofockham"
     vb.memory = 4096
     vb.cpus = 4
 
