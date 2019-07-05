@@ -11,11 +11,11 @@ DPDK_IMG = dpdk
 DPDK_DEVBIND_IMG = dpdk-devbind
 DPDK_BASE_DIR = $(BASE_DIR)/dpdk
 DPDK_DOCKERFILE = $(DPDK_BASE_DIR)/Dockerfile
-DPDK_VERSION = 17.08.1
+DPDK_VERSION = 18.11.2
 
 SANDBOX_IMG = sandbox
 SANDBOX_DOCKERFILE = Dockerfile
-RUST_VERSION = nightly-2019-02-01
+RUST_VERSION = nightly-2019-07-03
 
 ESM_IMG = consul-esm
 ESM_BASE_DIR = $(BASE_DIR)/consul-esm

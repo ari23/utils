@@ -27,7 +27,7 @@ RUN install_packages \
 ## development image with DPDK and Rust
 ##
 
-FROM williamofockham/dpdk:17.08.1
+FROM williamofockham/dpdk:18.11.2
 
 LABEL maintainer="williamofockham <occam_engineering@comcast.com>"
 
