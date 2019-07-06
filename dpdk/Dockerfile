@@ -18,7 +18,7 @@ RUN install_packages \
   && cd /tmp \
   && curl -sSf https://fast.dpdk.org/rel/dpdk-${DPDK_VERSION}.tar.xz | tar -xJv
 
-COPY common_linuxapp-17.08.container ${RTE_SDK}/config/common_linuxapp
+COPY common_linuxapp-18.11.container ${RTE_SDK}/config/common_linuxapp
 COPY defconfig_x86_64-nhm-linuxapp-gcc ${RTE_SDK}/config/defconfig_x86_64-nhm-linuxapp-gcc
 
 WORKDIR ${RTE_SDK}

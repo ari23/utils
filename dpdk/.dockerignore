@@ -3,5 +3,5 @@
 *
 
 # White list only the required files
-!common_linuxapp-17.08.container
+!common_linuxapp-18.11.container
 !defconfig_x86_64-nhm-linuxapp-gcc
