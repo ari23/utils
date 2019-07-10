@@ -24,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at https://docs.vagrantup.com.
   config.vm.box = "ubuntu/bionic64"
-  config.disksize.size = "30GB"
+  config.disksize.size = "45GB"
 
   # e.g. for wireshark forwarding
   config.ssh.forward_x11 = true
