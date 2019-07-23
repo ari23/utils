@@ -14,6 +14,7 @@ RUN install_packages \
     curl \
     libnuma-dev \
     libpcap-dev \
+    libz-dev \
     xz-utils \
   && cd /tmp \
   && curl -sSf https://fast.dpdk.org/rel/dpdk-${DPDK_VERSION}.tar.xz | tar -xJv
