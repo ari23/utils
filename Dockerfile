@@ -76,9 +76,9 @@ RUN install_packages \
   && apt-get update -o Dir::Etc::sourcelist=${BACKPORTS_REPO} \
   && apt-get -t stretch-backports install -y --no-install-recommends libluajit-5.1-dev \
   # install bcc tools
-  && echo "deb [trusted=yes] http://repo.iovisor.org/apt/xenial xenial-nightly main" > ${IOVISOR_REPO} \
+  && echo "deb [trusted=yes] http://repo.iovisor.org/apt/bionic bionic-nightly main" > ${IOVISOR_REPO} \
   && apt-get update -o Dir::Etc::sourcelist=${IOVISOR_REPO} \
-  && apt-get -t xenial-nightly install -y --no-install-recommends bcc-tools \
+  && apt-get -t bionic-nightly install -y --no-install-recommends bcc-tools \
   && rm -rf /var/lib/apt/lists /var/cache/apt/archives \
   # install rust nightly and tools
   && curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN \
@@ -90,7 +90,6 @@ RUN install_packages \
   && cargo install cargo-watch \
   && cargo install cargo-expand \
   && cargo install hyperfine \
-  && cargo install ripgrep \
   && cargo install sccache \
   && RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install -f cargo-tarpaulin \
   && rm -rf /root/.cargo/registry

@@ -21,9 +21,14 @@ before_install:
       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     fi
 
+env:
+  global:
+    - CACHE_FOLDER=$HOME/docker-images
+    - CACHE_FILE=${CACHE_FOLDER}/sandbox-${TRAVIS_COMMIT}.tgz
+
 jobs:
   include:
-    - stage: build
+    - stage: build-and-push
       name: dpdk
       script: |
               make -f docker.mk build-dpdk
@@ -36,11 +41,12 @@ jobs:
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
                 make -f docker.mk push-dpdk-devbind
               fi
-    - name: sandbox
+    - name: sandbox-build-only
       script: |
               make -f docker.mk build-sandbox
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-sandbox
+                mkdir -p ${CACHE_FOLDER}
+                docker save ${IMAGE} | gzip -c > ${CACHE_FILE}
               fi
     - name: dind
       script: |
@@ -66,3 +72,14 @@ jobs:
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
                 make -f docker.mk push-packer-ansible
               fi
+
+    - stage: push-sandbox
+      script: |
+              if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+                if [[ -f ${CACHE_FILE} ]]; then docker load -i ${CACHE_FILE}; fi
+                  make -f docker.mk push-sandbox
+              fi
+
+cache:
+  directories:
+    - ${CACHE_FOLDER}

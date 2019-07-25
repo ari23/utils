@@ -38,10 +38,12 @@ PACKER_ANSIBLE_BASE_DIR = $(BASE_DIR)/$(PACKER_ANSIBLE)
 PACKER_ANSIBLE_DOCKERFILE = $(PACKER_ANSIBLE_BASE_DIR)/Dockerfile
 ANSIBLE_VERSION = 2.7.6
 
-.PHONY: build build-dpdk build-dpdk-devbind build-sandbox build-esm build-dind build-gobgp build-packer-ansible \
-		push push-dpdk push-dpdk-devbind push-sandbox push-esm push-dind push-gobgp push-packer-ansible \
-		pull pull-dpdk pull-dpdk-devbind pull-sandbox pull-esm pull-dind pull-gobgp pull-packer-ansible \
-		publish rmi
+.PHONY: build build-dpdk build-dpdk-devbind build-dind build-esm build-gobgp build-packer-ansible build-sandbox \
+        publish push push-dpdk push-dpdk-devbind push-esm push-dind push-gobgp push-packer-ansible push-sandbox \
+        pull pull-dpdk pull-dpdk-devbind pull-esm pull-dind pull-gobgp pull-packer-ansible pull-sandbox \
+        rmi run
+
+build: build-dpdk build-dpdk-devbind build-sandbox build-esm build-dind pull-gobgp build-packer-ansible
 
 build-dpdk:
 	@docker build -f $(DPDK_DOCKERFILE) --target $(DPDK_IMG) \
@@ -53,20 +55,15 @@ build-dpdk-devbind:
 		--build-arg DPDK_VERSION=${DPDK_VERSION} \
 		-t $(NAMESPACE)/$(DPDK_DEVBIND_IMG):$(DPDK_VERSION) $(DPDK_BASE_DIR)
 
-build-sandbox:
-	@docker build -f $(SANDBOX_DOCKERFILE) \
-		--build-arg RUSTUP_TOOLCHAIN=${RUST_VERSION} \
-		-t $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) $(shell pwd)
+build-dind:
+	@docker build -f $(DIND_DOCKERFILE) \
+	--build-arg COMPOSE=${DIND_VERSION} \
+	-t $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION) $(DIND_BASE_DIR)
 
 build-esm:
 	@docker build -f $(ESM_DOCKERFILE) \
 	--build-arg CONSUL_ESM=${ESM_VERSION} \
 	-t $(NAMESPACE)/$(ESM_IMG):$(ESM_VERSION) $(ESM_BASE_DIR)
-
-build-dind:
-	@docker build -f $(DIND_DOCKERFILE) \
-	--build-arg COMPOSE=${DIND_VERSION} \
-	-t $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION) $(DIND_BASE_DIR)
 
 build-gobgp:
 	@docker build -f $(GOBGP_DOCKERFILE) \
@@ -78,30 +75,14 @@ build-packer-ansible:
 	--build-arg ANSIBLE_VERSION=${ANSIBLE_VERSION} \
 	-t $(NAMESPACE)/$(PACKER_ANSIBLE):$(ANSIBLE_VERSION) $(PACKER_ANSIBLE_BASE_DIR)
 
-build: build-dpdk build-dpdk-devbind build-sandbox build-esm build-dind pull-gobgp build-packer-ansible
+build-sandbox:
+	@docker build -f $(SANDBOX_DOCKERFILE) \
+		--build-arg RUSTUP_TOOLCHAIN=${RUST_VERSION} \
+		-t $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) $(shell pwd)
 
-push-dpdk:
-	@docker push $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION)
+publish: build push
 
-push-dpdk-devbind:
-	@docker push $(NAMESPACE)/$(DPDK_DEVBIND_IMG):$(DPDK_VERSION)
-
-push-sandbox:
-	@docker push $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION)
-
-push-esm:
-	@docker push $(NAMESPACE)/$(ESM_IMG):$(ESM_VERSION)
-
-push-dind:
-	@docker push $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION)
-
-push-gobgp:
-	@docker push $(NAMESPACE)/$(GOBGP_IMG):$(GOBGP_VERSION)
-
-push-packer-ansible:
-	@docker push $(NAMESPACE)/$(PACKER_ANSIBLE_IMG):$(ANSIBLE_VERSION)
-
-push: push-dpdk push-dpdk-devbind push-sandbox push-esm push-dind push-gobgp push-packer-ansible
+pull: pull-dpdk pull-dpdk-devbind pull-sandbox pull-esm pull-dind pull-gobgp pull-packer-ansible
 
 pull-dpdk:
 	@docker pull $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION)
@@ -124,9 +105,28 @@ pull-gobgp:
 pull-packer-ansible:
 	@docker pull $(NAMESPACE)/$(PACKER_ANSIBLE_IMG):$(ANSIBLE_VERSION)
 
-pull: pull-dpdk pull-dpdk-devbind pull-sandbox pull-esm pull-dind pull-gobgp pull-packer-ansible
+push: push-dpdk push-dpdk-devbind push-sandbox push-esm push-dind push-gobgp push-packer-ansible
 
-publish: build push
+push-dpdk:
+	@docker push $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION)
+
+push-dpdk-devbind:
+	@docker push $(NAMESPACE)/$(DPDK_DEVBIND_IMG):$(DPDK_VERSION)
+
+push-esm:
+	@docker push $(NAMESPACE)/$(ESM_IMG):$(ESM_VERSION)
+
+push-dind:
+	@docker push $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION)
+
+push-gobgp:
+	@docker push $(NAMESPACE)/$(GOBGP_IMG):$(GOBGP_VERSION)
+
+push-packer-ansible:
+	@docker push $(NAMESPACE)/$(PACKER_ANSIBLE_IMG):$(ANSIBLE_VERSION)
+
+push-sandbox:
+	@docker push $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION)
 
 rmi:
 	@docker rmi $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION) \
