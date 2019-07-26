@@ -39,9 +39,9 @@ PACKER_ANSIBLE_DOCKERFILE = $(PACKER_ANSIBLE_BASE_DIR)/Dockerfile
 ANSIBLE_VERSION = 2.7.6
 
 .PHONY: build build-dpdk build-dpdk-devbind build-dind build-esm build-gobgp build-packer-ansible build-sandbox \
-        publish push push-dpdk push-dpdk-devbind push-esm push-dind push-gobgp push-packer-ansible push-sandbox \
-        pull pull-dpdk pull-dpdk-devbind pull-esm pull-dind pull-gobgp pull-packer-ansible pull-sandbox \
-        rmi run
+        load-sandbox publish push push-dpdk push-dpdk-devbind push-esm push-dind push-gobgp push-packer-ansible \
+        push-sandbox pull pull-dpdk pull-dpdk-devbind pull-esm pull-dind pull-gobgp pull-packer-ansible pull-sandbox \
+        rmi run save-sandbox
 
 build: build-dpdk build-dpdk-devbind build-sandbox build-esm build-dind pull-gobgp build-packer-ansible
 
@@ -79,6 +79,9 @@ build-sandbox:
 	@docker build -f $(SANDBOX_DOCKERFILE) \
 		--build-arg RUSTUP_TOOLCHAIN=${RUST_VERSION} \
 		-t $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) $(shell pwd)
+
+load-sandbox:
+	@docker load -i ${HOME}/sandbox.tgz
 
 publish: build push
 
@@ -145,3 +148,6 @@ run:
 		-v $(BASE_DIR)/NetBricks:/opt/netbricks \
 		-v $(BASE_DIR)/MoonGen:/opt/moongen \
 		$(SANDBOX) /bin/bash
+
+save-sandbox:
+	@docker save $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) | gzip -c > $(HOME)/sandbox.tgz

@@ -23,8 +23,7 @@ before_install:
 
 env:
   global:
-    - CACHE_FOLDER=$HOME/docker-images
-    - CACHE_FILE=${CACHE_FOLDER}/sandbox-${TRAVIS_COMMIT}.tgz
+    - CACHE_FOLDER=$HOME
 
 jobs:
   include:
@@ -45,8 +44,7 @@ jobs:
       script: |
               make -f docker.mk build-sandbox
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                mkdir -p ${CACHE_FOLDER}
-                docker save ${IMAGE} | gzip -c > ${CACHE_FILE}
+                make -f docker.mk save-sandbox
               fi
     - name: dind
       script: |
@@ -76,7 +74,7 @@ jobs:
     - stage: push-sandbox
       script: |
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                if [[ -f ${CACHE_FILE} ]]; then docker load -i ${CACHE_FILE}; fi
+                  make -f docker.mk load-sandbox
                   make -f docker.mk push-sandbox
               fi
 
