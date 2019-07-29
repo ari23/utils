@@ -70,7 +70,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider "virtualbox" do |vb|
     # Set machine name, memory and CPU limits
     vb.name = "ubuntu-bionic-williamofockham"
-    vb.memory = 4096
+    vb.memory = 8192
     vb.cpus = 4
 
     # Configure VirtualBox to enable passthrough of SSE 4.1 and SSE 4.2 instructions,

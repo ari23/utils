@@ -21,12 +21,12 @@ sudo -E apt-get -q install -y cmake mg make git linux-headers-$(uname -r) clang-
 # cd wireshark-$WIRESHARK_VERS && ./configure && make -j$(nproc) && sudo make install && sudo ldconfig
 
 
-# Allocate 1024 hugepages of 2 MB
+# Allocate 2048 hugepages of 2 MB
 # Change can be validated by executing 'cat /proc/meminfo | grep Huge'
-echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+echo 2048 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 
-# Allocate 1024 hugepages of 2 MB at startup
-echo "vm.nr_hugepages = 1024" >> /etc/sysctl.conf
+# Allocate 2048 hugepages of 2 MB at startup
+echo "vm.nr_hugepages = 2048" >> /etc/sysctl.conf
 
 # Install the uio_pci_generic driver
 modprobe uio_pci_generic
