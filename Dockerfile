@@ -1,30 +1,11 @@
 ##
-## compiling tcpreplay from source
+## pull from our tcpreplay and rust-utils (rustils) containers
 ##
-
-FROM bitnami/minideb:stretch as tcpreplay
-
-ARG RELEASE=4.3.0
-
-RUN install_packages \
-    build-essential \
-    ca-certificates \
-    curl \
-    file \
-    libpcap-dev \
-    tcpdump \
-  && cd /tmp \
-  && curl -sSfL https://github.com/appneta/tcpreplay/releases/download/v${RELEASE}/tcpreplay-${RELEASE}.tar.xz | tar -xJv \
-  && cd tcpreplay-${RELEASE} \
-  # replace the occurrences of ETH_P_ALL with ETH_P_IP
-  && sed -i 's|ETH_P_ALL|'"ETH_P_IP"'|g' src/common/sendpacket.c \
-  && ./configure \
-  && make \
-  && make install
-
+FROM williamofockham/tcpreplay:4.3.0 as tcpreplay
+FROM williamofockham/rustils:nightly-2019-07-03 as rustils
 
 ##
-## development image with DPDK and Rust
+## development image with DPDK
 ##
 
 FROM williamofockham/dpdk:18.11.2
@@ -42,6 +23,8 @@ ENV RUST_BACKTRACE=1
 
 COPY --from=tcpreplay /usr/local/bin /usr/local/bin
 COPY --from=tcpreplay /usr/local/share/man/man1 /usr/local/share/man/man1
+COPY --from=rustils /root/.cargo/bin /root/.cargo/bin
+COPY --from=rustils /root/.rustup /root/.rustup
 
 RUN install_packages \
   # clang, libclang-dev and libsctp-dev are netbricks deps
@@ -79,20 +62,7 @@ RUN install_packages \
   && echo "deb [trusted=yes] http://repo.iovisor.org/apt/bionic bionic-nightly main" > ${IOVISOR_REPO} \
   && apt-get update -o Dir::Etc::sourcelist=${IOVISOR_REPO} \
   && apt-get -t bionic-nightly install -y --no-install-recommends bcc-tools \
-  && rm -rf /var/lib/apt/lists /var/cache/apt/archives \
-  # install rust nightly and tools
-  && curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN \
-  && rustup component add \
-    clippy-preview \
-    rustfmt-preview \
-    rust-src \
-  # invoke cargo install independently otherwise partial failure has the incorrect exit code
-  && cargo install cargo-watch \
-  && cargo install cargo-expand \
-  && cargo install hyperfine \
-  && cargo install sccache \
-  && RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install -f cargo-tarpaulin \
-  && rm -rf /root/.cargo/registry
+  && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 ENV RUSTC_WRAPPER=sccache
 

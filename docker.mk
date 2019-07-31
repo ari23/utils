@@ -15,7 +15,6 @@ DPDK_VERSION = 18.11.2
 
 SANDBOX_IMG = sandbox
 SANDBOX_DOCKERFILE = Dockerfile
-RUST_VERSION = nightly-2019-07-03
 
 ESM_IMG = consul-esm
 ESM_BASE_DIR = $(BASE_DIR)/consul-esm
@@ -38,12 +37,33 @@ PACKER_ANSIBLE_BASE_DIR = $(BASE_DIR)/$(PACKER_ANSIBLE)
 PACKER_ANSIBLE_DOCKERFILE = $(PACKER_ANSIBLE_BASE_DIR)/Dockerfile
 ANSIBLE_VERSION = 2.7.6
 
-.PHONY: build build-dpdk build-dpdk-devbind build-dind build-esm build-gobgp build-packer-ansible build-sandbox \
-        load-sandbox publish push push-dpdk push-dpdk-devbind push-esm push-dind push-gobgp push-packer-ansible \
-        push-sandbox pull pull-dpdk pull-dpdk-devbind pull-esm pull-dind pull-gobgp pull-packer-ansible pull-sandbox \
+RUSTILS_IMG = rustils
+RUSTILS_BASE_DIR = $(BASE_DIR)/rustils
+RUSTILS_DOCKERFILE = $(RUSTILS_BASE_DIR)/Dockerfile
+RUST_VERSION = nightly-2019-07-03
+
+TCPREPLAY_IMG = tcpreplay
+TCPREPLAY_BASE_DIR = $(BASE_DIR)/tcpreplay
+TCPREPLAY_DOCKERFILE = $(TCPREPLAY_BASE_DIR)/Dockerfile
+TCPREPLAY_VERSION = 4.3.0
+
+.PHONY: build build-dind build-dpdk build-dpdk-devbind build-esm build-gobgp \
+        build-packer-ansible build-rustils build-sandbox build-tcpreplay \
+        load-sandbox publish \
+        push push-dind push-dpdk push-dpdk-devbind push-esm push-gobgp \
+        push-packer-ansible push-rustils push-sandbox push-tcpreplay \
+        pull pull-dind pull-dpdk pull-dpdk-devbind pull-esm pull-gobgp \
+        pull-packer-ansible pull-sandbox pull-tcpreplay \
         rmi run save-sandbox
 
-build: build-dpdk build-dpdk-devbind build-sandbox build-esm build-dind pull-gobgp build-packer-ansible
+build: build-dind build-dpdk build-dpdk-devbind build-esm \
+       build-gobgp build-packer-ansible build-rustils build-sandbox \
+       build-tcpreplay
+
+build-dind:
+	@docker build -f $(DIND_DOCKERFILE) \
+	--build-arg COMPOSE=${DIND_VERSION} \
+	-t $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION) $(DIND_BASE_DIR)
 
 build-dpdk:
 	@docker build -f $(DPDK_DOCKERFILE) --target $(DPDK_IMG) \
@@ -54,11 +74,6 @@ build-dpdk-devbind:
 	@docker build -f $(DPDK_DOCKERFILE) --target $(DPDK_DEVBIND_IMG) \
 		--build-arg DPDK_VERSION=${DPDK_VERSION} \
 		-t $(NAMESPACE)/$(DPDK_DEVBIND_IMG):$(DPDK_VERSION) $(DPDK_BASE_DIR)
-
-build-dind:
-	@docker build -f $(DIND_DOCKERFILE) \
-	--build-arg COMPOSE=${DIND_VERSION} \
-	-t $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION) $(DIND_BASE_DIR)
 
 build-esm:
 	@docker build -f $(ESM_DOCKERFILE) \
@@ -75,17 +90,31 @@ build-packer-ansible:
 	--build-arg ANSIBLE_VERSION=${ANSIBLE_VERSION} \
 	-t $(NAMESPACE)/$(PACKER_ANSIBLE):$(ANSIBLE_VERSION) $(PACKER_ANSIBLE_BASE_DIR)
 
+build-rustils:
+	@docker build -f $(RUSTILS_DOCKERFILE) \
+		--build-arg RUSTUP_TOOLCHAIN=${RUST_VERSION} \
+		-t $(NAMESPACE)/$(RUSTILS_IMG):$(RUST_VERSION) $(shell pwd)
+
 build-sandbox:
 	@docker build -f $(SANDBOX_DOCKERFILE) \
 		--build-arg RUSTUP_TOOLCHAIN=${RUST_VERSION} \
 		-t $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) $(shell pwd)
+
+build-tcpreplay:
+	@docker build -f $(TCPREPLAY_DOCKERFILE) \
+		--build-arg TCPREPLAY_VERSION=${TCPREPLAY_VERSION} \
+		-t $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION) $(shell pwd)
 
 load-sandbox:
 	@docker load -i ${HOME}/sandbox.tgz
 
 publish: build push
 
-pull: pull-dpdk pull-dpdk-devbind pull-sandbox pull-esm pull-dind pull-gobgp pull-packer-ansible
+pull: pull-dind pull-dpdk pull-dpdk-devbind pull-esm pull-gobgp \
+      pull-packer-ansible pull-sandbox pull-tcpreplay
+
+pull-dind:
+	@docker pull $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION)
 
 pull-dpdk:
 	@docker pull $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION)
@@ -93,14 +122,8 @@ pull-dpdk:
 pull-dpdk-devbind:
 	@docker pull $(NAMESPACE)/$(DPDK_DEVBIND_IMG):$(DPDK_VERSION)
 
-pull-sandbox:
-	@docker pull $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION)
-
 pull-esm:
 	@docker pull $(NAMESPACE)/$(ESM_IMG):$(ESM_VERSION)
-
-pull-dind:
-	@docker pull $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION)
 
 pull-gobgp:
 	@docker pull $(NAMESPACE)/$(GOBGP_IMG):$(GOBGP_VERSION)
@@ -108,7 +131,17 @@ pull-gobgp:
 pull-packer-ansible:
 	@docker pull $(NAMESPACE)/$(PACKER_ANSIBLE_IMG):$(ANSIBLE_VERSION)
 
-push: push-dpdk push-dpdk-devbind push-sandbox push-esm push-dind push-gobgp push-packer-ansible
+pull-rustils:
+	@docker pull $(NAMESPACE)/$(RUSTILS_IMG):$(RUST_VERSION)
+
+pull-sandbox:
+	@docker pull $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION)
+
+pull-tcpreplay:
+	@docker pull $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION)
+
+push: push-dind push-dpdk push-dpdk-devbind push-esm push-gobgp \
+      push-packer-ansible push-rustils push-sandbox
 
 push-dpdk:
 	@docker push $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION)
@@ -128,8 +161,14 @@ push-gobgp:
 push-packer-ansible:
 	@docker push $(NAMESPACE)/$(PACKER_ANSIBLE_IMG):$(ANSIBLE_VERSION)
 
+push-rustils:
+	@docker push $(NAMESPACE)/$(RUSTILS_IMG):$(RUST_VERSION)
+
 push-sandbox:
 	@docker push $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION)
+
+push-tcpreplay:
+	@docker push $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION)
 
 rmi:
 	@docker rmi $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION) \

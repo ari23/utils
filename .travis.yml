@@ -21,30 +21,40 @@ before_install:
       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     fi
 
-env:
-  global:
-    - CACHE_FOLDER=$HOME
-
 jobs:
   include:
-    - stage: build-and-push
+    - stage: build-and-push-tcpreplay+rustils
+      name: tcpreplay
+      script: |
+              make -f docker.mk build-tcpreplay
+              if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+                make -f docker.mk push-tcpreplay
+              fi
+    - name: build-and-push-rustils
+      script: |
+              make -f docker.mk build-rustils
+              if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+                make -f docker.mk push-rustils
+              fi
+    - stage: build-and-push-dpdk
       name: dpdk
       script: |
               make -f docker.mk build-dpdk
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
                 make -f docker.mk push-dpdk
               fi
+    - stage: build-and-push-containers
     - name: dpdk-devbind
       script: |
               make -f docker.mk build-dpdk-devbind
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
                 make -f docker.mk push-dpdk-devbind
               fi
-    - name: sandbox-build-only
+    - name: sandbox
       script: |
               make -f docker.mk build-sandbox
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk save-sandbox
+                make -f docker.mk push-sandbox
               fi
     - name: dind
       script: |
@@ -70,14 +80,3 @@ jobs:
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
                 make -f docker.mk push-packer-ansible
               fi
-
-    - stage: push-sandbox
-      script: |
-              if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                  make -f docker.mk load-sandbox
-                  make -f docker.mk push-sandbox
-              fi
-
-cache:
-  directories:
-    - ${CACHE_FOLDER}
