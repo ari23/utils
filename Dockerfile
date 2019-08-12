@@ -59,9 +59,9 @@ RUN install_packages \
   && apt-get update -o Dir::Etc::sourcelist=${BACKPORTS_REPO} \
   && apt-get -t stretch-backports install -y --no-install-recommends libluajit-5.1-dev \
   # install bcc tools
-  && echo "deb [trusted=yes] http://repo.iovisor.org/apt/bionic bionic-nightly main" > ${IOVISOR_REPO} \
+  && echo "deb [trusted=yes] http://repo.iovisor.org/apt/xenial xenial main" > ${IOVISOR_REPO} \
   && apt-get update -o Dir::Etc::sourcelist=${IOVISOR_REPO} \
-  && apt-get -t bionic-nightly install -y --no-install-recommends bcc-tools \
+  && apt-get -t xenial install -y --no-install-recommends bcc-tools \
   && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 ENV RUSTC_WRAPPER=sccache
