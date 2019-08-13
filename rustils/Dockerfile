@@ -4,10 +4,15 @@ ARG RUSTUP_TOOLCHAIN
 
 ENV PATH=$PATH:/root/.cargo/bin
 
+# clang + llvm + libclang (all version 3.9) for bindgen deps ~
+# https://rust-lang.github.io/rust-bindgen/requirements.html
 RUN install_packages \
     build-essential \
     ca-certificates \
+    clang-3.9 \
     curl \
+    llvm-3.9-dev \
+    libclang-3.9-dev \
     libgnutls-openssl-dev \
     libssl-dev \
   && curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN \
