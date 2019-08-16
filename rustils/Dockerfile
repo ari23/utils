@@ -11,10 +11,10 @@ RUN install_packages \
     ca-certificates \
     clang-3.9 \
     curl \
-    llvm-3.9-dev \
     libclang-3.9-dev \
     libgnutls-openssl-dev \
     libssl-dev \
+    llvm-3.9-dev \
   && curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain $RUSTUP_TOOLCHAIN \
   && rustup component add \
     clippy-preview \

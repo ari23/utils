@@ -32,18 +32,19 @@ RUN install_packages \
   # libssl-dev and pkg-config are rust deps
     build-essential \
     ca-certificates \
-    clang \
+    clang-3.9 \
     cmake \
     curl \
     gdb \
     gdbserver \
     git \
-    libclang-dev \
+    libclang-3.9-dev \
     libcurl4-gnutls-dev \
     libgnutls30 \
     libgnutls-openssl-dev \
     libsctp-dev \
     libssl-dev \
+    llvm-3.9-dev \
     pkg-config \
     python-pip \
     python-setuptools \
@@ -52,6 +53,7 @@ RUN install_packages \
     tcpdump \
   # pyroute2 and toml are agent deps
   && pip install \
+    bitstruct \
     pyroute2 \
     toml \
   # install luajit 2.1.0-beta3 from stretch backports
