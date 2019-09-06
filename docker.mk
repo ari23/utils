@@ -47,18 +47,26 @@ TCPREPLAY_BASE_DIR = $(BASE_DIR)/tcpreplay
 TCPREPLAY_DOCKERFILE = $(TCPREPLAY_BASE_DIR)/Dockerfile
 TCPREPLAY_VERSION = 4.3.0
 
+TEMPLATE_IMG = consul-template
+TEMPLATE_BASE_DIR = $(BASE_DIR)/consul-template
+TEMPLATE_DOCKERFILE = $(TEMPLATE_BASE_DIR)/Dockerfile
+TEMPLATE_VERSION = 0.19.5-docker
+
 .PHONY: build build-dind build-dpdk build-dpdk-devbind build-esm build-gobgp \
         build-packer-ansible build-rustils build-sandbox build-tcpreplay \
-        load-sandbox publish \
+        build-template \
+	load-sandbox publish \
         push push-dind push-dpdk push-dpdk-devbind push-esm push-gobgp \
         push-packer-ansible push-rustils push-sandbox push-tcpreplay \
-        pull pull-dind pull-dpdk pull-dpdk-devbind pull-esm pull-gobgp \
+        push-template \
+	pull pull-dind pull-dpdk pull-dpdk-devbind pull-esm pull-gobgp \
         pull-packer-ansible pull-sandbox pull-tcpreplay \
-        rmi run save-sandbox
+        pull-template \
+	rmi run save-sandbox
 
 build: build-dind build-dpdk build-dpdk-devbind build-esm \
        build-gobgp build-packer-ansible build-rustils build-sandbox \
-       build-tcpreplay
+       build-tcpreplay build-template
 
 build-dind:
 	@docker build -f $(DIND_DOCKERFILE) \
@@ -105,13 +113,17 @@ build-tcpreplay:
 		--build-arg TCPREPLAY_VERSION=${TCPREPLAY_VERSION} \
 		-t $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION) $(shell pwd)
 
+build-template:
+	@docker build -f $(TEMPLATE_DOCKERFILE) \
+	-t $(NAMESPACE)/$(TEMPLATE_IMG):$(TEMPLATE_VERSION) $(TEMPLATE_BASE_DIR)
+
 load-sandbox:
 	@docker load -i ${HOME}/sandbox.tgz
 
 publish: build push
 
 pull: pull-dind pull-dpdk pull-dpdk-devbind pull-esm pull-gobgp \
-      pull-packer-ansible pull-sandbox pull-tcpreplay
+      pull-packer-ansible pull-sandbox pull-tcpreplay pull-template
 
 pull-dind:
 	@docker pull $(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION)
@@ -140,8 +152,11 @@ pull-sandbox:
 pull-tcpreplay:
 	@docker pull $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION)
 
+pull-template:
+	@docker pull $(NAMESPACE)/$(TEMPLATE_IMG):$(TEMPLATE_VERSION)
+
 push: push-dind push-dpdk push-dpdk-devbind push-esm push-gobgp \
-      push-packer-ansible push-rustils push-sandbox
+      push-packer-ansible push-rustils push-sandbox push-template
 
 push-dpdk:
 	@docker push $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION)
@@ -170,13 +185,17 @@ push-sandbox:
 push-tcpreplay:
 	@docker push $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION)
 
+push-template:
+	@docker push $(NAMESPACE)/$(TEMPLATE_IMG):$(TEMPLATE_VERSION)
+
 rmi:
 	@docker rmi $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION) \
 		$(NAMESPACE)/$(DPDK_DEVBIND_IMG):$(DPDK_VERSION) \
 		$(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) \
 		$(NAMESPACE)/$(ESM_IMG):$(ESM_VERSION) \
 		$(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION) \
-		$(NAMESPACE)/$(GOBGP_IMG):$(GOBGP_VERSION)
+		$(NAMESPACE)/$(GOBGP_IMG):$(GOBGP_VERSION) \
+		$(NAMESPACE)/$(TEMPLATE_IMG):$(TEMPLATE_VERSION)
 
 run:
 	@docker run -it --rm --privileged --network=host \
