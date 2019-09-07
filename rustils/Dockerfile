@@ -20,10 +20,4 @@ RUN install_packages \
     clippy-preview \
     rustfmt-preview \
     rust-src \
-  # invoke cargo install independently otherwise partial failure has the incorrect exit code
-  && cargo install cargo-watch \
-  && cargo install cargo-expand \
-  && cargo install hyperfine \
-  && cargo install sccache \
-  && RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install -f cargo-tarpaulin \
   && rm -rf /root/.cargo/registry /var/lib/apt/lists /var/cache/apt/archives
