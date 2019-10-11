@@ -38,19 +38,23 @@ FROM ubuntu:bionic as dpdk
 
 LABEL maintainer="williamofockham <occam_engineering@comcast.com>"
 
+ARG DPDK_VERSION
+
 RUN apt-get update \
   && apt-get upgrade -y \
   && apt-get install -y \
     iproute2 \
+    kmod \
     libnuma-dev \
     libpcap-dev \
     pciutils \
     python \
-    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
+  && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/local/include
 COPY --from=builder /usr/local/lib /usr/local/lib/dpdk
+COPY --from=builder /tmp/dpdk-stable-${DPDK_VERSION}/build/kmod /usr/local/lib/extra/dpdk
 COPY --from=builder /usr/local/sbin /usr/local/sbin
 COPY --from=builder /usr/local/share/dpdk /usr/local/share/dpdk
 
