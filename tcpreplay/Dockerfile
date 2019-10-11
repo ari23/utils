@@ -1,8 +1,10 @@
-FROM bitnami/minideb:stretch
+FROM ubuntu:bionic
 
 ARG TCPREPLAY_VERSION
 
-RUN install_packages \
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y \
     build-essential \
     ca-certificates \
     curl \

@@ -13,7 +13,6 @@ FROM williamofockham/dpdk:18.11.2
 LABEL maintainer="williamofockham <occam_engineering@comcast.com>"
 
 ARG RUSTUP_TOOLCHAIN
-ARG BACKPORTS_REPO=/etc/apt/sources.list.d/stretch-backports.list
 ARG IOVISOR_REPO=/etc/apt/sources.list.d/iovisor.list
 
 ENV PATH=$PATH:/root/.cargo/bin
@@ -26,10 +25,13 @@ COPY --from=tcpreplay /usr/local/share/man/man1 /usr/local/share/man/man1
 COPY --from=rustils /root/.cargo/bin /root/.cargo/bin
 COPY --from=rustils /root/.rustup /root/.rustup
 
-RUN install_packages \
-  # clang, libclang-dev and libsctp-dev are netbricks deps
-  # cmake, git and libluajit-5.1-dev are moongen deps
-  # libssl-dev and pkg-config are rust deps
+# clang, libclang-dev and libsctp-dev are netbricks deps
+# cmake, git and libluajit-5.1-dev are moongen deps
+# gnuplot for criterion/bench plots
+# libssl-dev and pkg-config are general rust deps
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y \
     build-essential \
     ca-certificates \
     clang \
@@ -38,12 +40,15 @@ RUN install_packages \
     gdb \
     gdbserver \
     git \
+    gnuplot \
     libclang-dev \
     libcurl4-gnutls-dev \
     libgnutls30 \
     libgnutls-openssl-dev \
+    libluajit-5.1-dev \
     libsctp-dev \
     libssl-dev \
+    libtbb-dev \
     llvm-dev \
     pkg-config \
     python-pip \
@@ -56,10 +61,6 @@ RUN install_packages \
     bitstruct \
     pyroute2 \
     toml \
-  # install luajit 2.1.0-beta3 from stretch backports
-  && echo "deb http://ftp.debian.org/debian stretch-backports main" > ${BACKPORTS_REPO} \
-  && apt-get update -o Dir::Etc::sourcelist=${BACKPORTS_REPO} \
-  && apt-get -t stretch-backports install -y --no-install-recommends libluajit-5.1-dev \
   # install bcc tools
   && echo "deb [trusted=yes] http://repo.iovisor.org/apt/xenial xenial main" > ${IOVISOR_REPO} \
   && apt-get update -o Dir::Etc::sourcelist=${IOVISOR_REPO} \

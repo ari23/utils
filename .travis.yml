@@ -26,57 +26,57 @@ jobs:
     - stage: build-and-push-tcpreplay+rustils
       name: tcpreplay
       script: |
-              make -f docker.mk build-tcpreplay
+              make -f docker.mk build-tcpreplay || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-tcpreplay
+                make -f docker.mk push-tcpreplay || travis_terminate 1
               fi
     - name: build-and-push-rustils
       script: |
-              make -f docker.mk build-rustils
+              make -f docker.mk build-rustils || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-rustils
+                make -f docker.mk push-rustils || travis_terminate 1
               fi
     - stage: build-and-push-dpdk
       name: dpdk
       script: |
               make -f docker.mk build-dpdk
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-dpdk
+                make -f docker.mk push-dpdk || travis_terminate 1
               fi
     - stage: build-and-push-containers
     - name: dpdk-devbind
       script: |
-              make -f docker.mk build-dpdk-devbind
+              make -f docker.mk build-dpdk-devbind || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-dpdk-devbind
+                make -f docker.mk push-dpdk-devbind || travis_terminate 1
               fi
     - name: sandbox
       script: |
-              make -f docker.mk build-sandbox
+              make -f docker.mk build-sandbox || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-sandbox
+                make -f docker.mk push-sandbox || travis_terminate 1
               fi
     - name: dind
       script: |
-              make -f docker.mk build-dind
+              make -f docker.mk build-dind || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-dind
+                make -f docker.mk push-dind || travis_terminate 1
               fi
     - name: esm
       script: |
-              make -f docker.mk build-esm
+              make -f docker.mk build-esm || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-esm
+                make -f docker.mk push-esm || travis_terminate 1
               fi
     - name: gobgp
       script: |
-              make -f docker.mk build-gobgp
+              make -f docker.mk build-gobgp || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-gobgp
+                make -f docker.mk push-gobgp || travis_terminate 1
               fi
     - name: packer-ansible
       script: |
-              make -f docker.mk build-packer-ansible
+              make -f docker.mk build-packer-ansible || travis_terminate 1
               if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-                make -f docker.mk push-packer-ansible
+                make -f docker.mk push-packer-ansible || travis_terminate 1
               fi

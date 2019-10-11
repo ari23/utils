@@ -1,4 +1,4 @@
-FROM bitnami/minideb:stretch
+FROM ubuntu:bionic
 
 ARG RUSTUP_TOOLCHAIN
 ARG SCCACHE_VERSION=0.2.12
@@ -8,7 +8,9 @@ ENV PATH=$PATH:/root/.cargo/bin
 
 # clang + llvm + libclang for bindgen deps ~
 # https://rust-lang.github.io/rust-bindgen/requirements.html
-RUN install_packages \
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y \
     build-essential \
     ca-certificates \
     clang \

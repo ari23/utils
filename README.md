@@ -37,7 +37,7 @@ If you have MoonGen and NetBricks cloned as described in step 1 above, those rep
 ## Design of our Docker images
 
 ```
-bitnami/minideb:stretch              (upstream)
+ubuntu:bionic                        (upstream)
 +- williamofockham/dpdk              (container-friendy DPDK build)
    +- williamofockham/sandbox        (dev image for rust and ebpf)
 +- williamofockham/dpdk-devbind      (device bind utility)

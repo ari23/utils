@@ -2,19 +2,22 @@
 ## compiling DPDK from source
 ##
 
-FROM bitnami/minideb:stretch as builder
+FROM ubuntu:bionic as builder
 
 ARG DPDK_VERSION
 ARG RTE_SDK=/tmp/dpdk-stable-${DPDK_VERSION}
 ARG CFLAGS="-g3 -Wno-error=maybe-uninitialized -fPIC"
 
-RUN install_packages \
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y \
     build-essential \
     ca-certificates \
     curl \
     libnuma-dev \
     libpcap-dev \
     libz-dev \
+    linux-headers-$(uname -r) \
     xz-utils \
   && cd /tmp \
   && curl -sSf https://fast.dpdk.org/rel/dpdk-${DPDK_VERSION}.tar.xz | tar -xJv
@@ -28,20 +31,22 @@ RUN make config T=x86_64-nhm-linuxapp-gcc EXTRA_CFLAGS="${CFLAGS}" \
   && make -j$(nproc) EXTRA_CFLAGS="${CFLAGS}" \
   && make install
 
-
 ##
 ## image with DPDK dev libs and utils
 ##
-FROM bitnami/minideb:stretch as dpdk
+FROM ubuntu:bionic as dpdk
 
 LABEL maintainer="williamofockham <occam_engineering@comcast.com>"
 
-RUN install_packages \
-  iproute2 \
-  libnuma-dev \
-  libpcap-dev \
-  pciutils \
-  python
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y \
+    iproute2 \
+    libnuma-dev \
+    libpcap-dev \
+    pciutils \
+    python \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/local/include
@@ -55,18 +60,20 @@ RUN mkdir -p ${RTE_SDK}/build \
   && ln -s /usr/local/lib/dpdk ${RTE_SDK}/build/lib \
   && ln -s /usr/local/include/dpdk ${RTE_SDK}/build/include
 
-
 ##
 ## dpdk-devbind utility
 ##
-FROM bitnami/minideb:stretch as dpdk-devbind
+FROM ubuntu:bionic as dpdk-devbind
 
 LABEL maintainer="williamofockham <occam_engineering@comcast.com>"
 
-RUN install_packages \
-  iproute2 \
-  pciutils \
-  python
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y \
+    iproute2 \
+    pciutils \
+    python \
+  && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 COPY --from=builder /usr/local/share/dpdk/usertools/dpdk-devbind.py /usr/local/share/dpdk/usertools/dpdk-devbind.py
 COPY --from=builder /usr/local/sbin/dpdk-devbind /usr/local/sbin/dpdk-devbind
