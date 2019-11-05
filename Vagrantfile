@@ -66,6 +66,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           cmd: "/bin/bash -c 'dpdk-devbind --force -b #{$dpdk_driver} #{$dpdk_devices}'"
   end
 
+  # forward user-defined ports
+  ENV['FORWARDED_PORTS'].to_s.split(" ").each do |port|
+    config.vm.network :forwarded_port, guest: port, host: port
+  end
+
   # VirtualBox-specific configuration
   config.vm.provider "virtualbox" do |vb|
     # Set machine name, memory and CPU limits
