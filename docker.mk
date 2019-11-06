@@ -146,10 +146,10 @@ pull-packer-ansible:
 	@docker pull $(NAMESPACE)/$(PACKER_ANSIBLE_IMG):$(ANSIBLE_VERSION)
 
 pull-rustils:
-	@docker pull $(NAMESPACE)/$(RUSTILS_IMG):$(RUST_VERSION)
+	@docker pull $(NAMESPACE)/$(RUSTILS_IMG):$(RUSTUP_TOOLCHAIN)
 
 pull-sandbox:
-	@docker pull $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION)
+	@docker pull $(NAMESPACE)/$(SANDBOX_IMG):$(RUSTUP_TOOLCHAIN)
 
 pull-tcpreplay:
 	@docker pull $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION)
@@ -179,10 +179,10 @@ push-packer-ansible:
 	@docker push $(NAMESPACE)/$(PACKER_ANSIBLE_IMG):$(ANSIBLE_VERSION)
 
 push-rustils:
-	@docker push $(NAMESPACE)/$(RUSTILS_IMG):$(RUST_VERSION)
+	@docker push $(NAMESPACE)/$(RUSTILS_IMG):$(RUSTUP_TOOLCHAIN)
 
 push-sandbox:
-	@docker push $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION)
+	@docker push $(NAMESPACE)/$(SANDBOX_IMG):$(RUSTUP_TOOLCHAIN)
 
 push-tcpreplay:
 	@docker push $(NAMESPACE)/$(TCPREPLAY_IMG):$(TCPREPLAY_VERSION)
@@ -193,7 +193,7 @@ push-template:
 rmi:
 	@docker rmi $(NAMESPACE)/$(DPDK_IMG):$(DPDK_VERSION) \
 		$(NAMESPACE)/$(DPDK_DEVBIND_IMG):$(DPDK_VERSION) \
-		$(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) \
+		$(NAMESPACE)/$(SANDBOX_IMG):$(RUSTUP_TOOLCHAIN) \
 		$(NAMESPACE)/$(ESM_IMG):$(ESM_VERSION) \
 		$(NAMESPACE)/$(DIND_IMG):$(DIND_VERSION) \
 		$(NAMESPACE)/$(GOBGP_IMG):$(GOBGP_VERSION) \
@@ -210,4 +210,4 @@ run:
 		$(SANDBOX) /bin/bash
 
 save-sandbox:
-	@docker save $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) | gzip -c > $(HOME)/sandbox.tgz
+	@docker save $(NAMESPACE)/$(SANDBOX_IMG):$(RUSTUP_TOOLCHAIN) | gzip -c > $(HOME)/sandbox.tgz
