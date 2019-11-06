@@ -7,10 +7,10 @@ Utilities for NF developer setup/etc
 ## Creating a Developer environment with `vagrant`
 
 1. Clone this repository, [MoonGen](//github.com/williamofockham/MoonGen), and
-   [NetBricks](//github.com/williamofockham/NetBricks) into the same parent
+   [nb2](//github.com/williamofockham/nb2) into the same parent
    directory.
    ```shell
-   host$ for repo in utils MoonGen NetBricks; do \
+   host$ for repo in utils MoonGen nb2; do \
            git clone git@github.com:williamofockham/${repo}.git; \
          done
    ```
@@ -32,7 +32,7 @@ Utilities for NF developer setup/etc
 
 The above steps will prepare your virtual machine with all of the appropriate DPDK settings (multiple secondary NICs, install kernel modules, enable huge pages, bind the extra interfaces to DPDK drivers) and install [Containernet](https://containernet.github.io/).
 
-If you have MoonGen and NetBricks cloned as described in step 1 above, those repositories will be shared into the VM at `/vagrant/MoonGen` and `/vagrant/NetBricks` respectively.
+If you have MoonGen and nb2 cloned as described in step 1 above, those repositories will be shared into the VM at `/vagrant/MoonGen` and `/vagrant/nb2` respectively.
 
 ## Design of our Docker images
 
@@ -63,7 +63,7 @@ Then you can run the sandbox container from the root directory,
 vagrant$ make -f utils/docker.mk run
 ```
 
-NetBricks is shared into the container at `/opt/netbricks` and MoonGen is shared at `/opt/moongen`.
+nb2 is shared into the container at `/opt/nb2` and MoonGen is shared at `/opt/moongen`.
 
 Because DPDK has a lot of requirements from the host OS, many files and directories are mounted into the container, which also runs in "privileged" mode with "host" networking. The following mounts are required and handled by the run command:
 

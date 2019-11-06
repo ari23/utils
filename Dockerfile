@@ -1,22 +1,24 @@
+ARG RUSTUP_TOOLCHAIN
+ARG TCPREPLAY_VERSION
+ARG DPDK_VERSION
+
 ##
 ## pull from our tcpreplay and rust-utils (rustils) containers
 ##
-FROM williamofockham/tcpreplay:4.3.0 as tcpreplay
-FROM williamofockham/rustils:nightly-2019-07-03 as rustils
+FROM williamofockham/tcpreplay:$TCPREPLAY_VERSION as tcpreplay
+FROM williamofockham/rustils:$RUSTUP_TOOLCHAIN as rustils
 
 ##
 ## development image with DPDK
 ##
 
-FROM williamofockham/dpdk:18.11.2
+FROM williamofockham/dpdk:$DPDK_VERSION
 
 LABEL maintainer="williamofockham <occam_engineering@comcast.com>"
 
-ARG RUSTUP_TOOLCHAIN
 ARG IOVISOR_REPO=/etc/apt/sources.list.d/iovisor.list
 
 ENV PATH=$PATH:/root/.cargo/bin
-ENV LD_LIBRARY_PATH=/opt/netbricks/target/native:$LD_LIBRARY_PATH
 ENV CARGO_INCREMENTAL=0
 ENV RUST_BACKTRACE=1
 
@@ -25,7 +27,6 @@ COPY --from=tcpreplay /usr/local/share/man/man1 /usr/local/share/man/man1
 COPY --from=rustils /root/.cargo/bin /root/.cargo/bin
 COPY --from=rustils /root/.rustup /root/.rustup
 
-# clang, libclang-dev and libsctp-dev are netbricks deps
 # cmake, git and libluajit-5.1-dev are moongen deps
 # gnuplot for criterion/bench plots
 # libssl-dev and pkg-config are general rust deps
@@ -46,7 +47,6 @@ RUN apt-get update \
     libgnutls30 \
     libgnutls-openssl-dev \
     libluajit-5.1-dev \
-    libsctp-dev \
     libssl-dev \
     libtbb-dev \
     llvm-dev \

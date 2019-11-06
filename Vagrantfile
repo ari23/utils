@@ -34,7 +34,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "echo 'cd /vagrant' >> /home/vagrant/.bashrc", run: "always"
 
   # specific IP. This option is needed because DPDK takes over the NIC.
-  # 0000:00:08.0 used for netbricks
+  # 0000:00:08.0 used for nb2
   config.vm.network "private_network", ip: "10.1.2.1", mac: "BADCAFEBEEF1", nic_type: "virtio"
   # 0000:00:09.0 used for moongen
   config.vm.network "private_network", ip: "10.1.2.2", mac: "BADCAFEBEEF2", nic_type: "virtio"

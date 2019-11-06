@@ -40,7 +40,7 @@ ANSIBLE_VERSION = 2.7.6
 RUSTILS_IMG = rustils
 RUSTILS_BASE_DIR = $(BASE_DIR)/rustils
 RUSTILS_DOCKERFILE = $(RUSTILS_BASE_DIR)/Dockerfile
-RUST_VERSION = nightly-2019-07-03
+RUSTUP_TOOLCHAIN = nightly-2019-10-28
 
 TCPREPLAY_IMG = tcpreplay
 TCPREPLAY_BASE_DIR = $(BASE_DIR)/tcpreplay
@@ -100,13 +100,15 @@ build-packer-ansible:
 
 build-rustils:
 	@docker build -f $(RUSTILS_DOCKERFILE) \
-		--build-arg RUSTUP_TOOLCHAIN=${RUST_VERSION} \
-		-t $(NAMESPACE)/$(RUSTILS_IMG):$(RUST_VERSION) $(shell pwd)
+		--build-arg RUSTUP_TOOLCHAIN=${RUSTUP_TOOLCHAIN} \
+		-t $(NAMESPACE)/$(RUSTILS_IMG):$(RUSTUP_TOOLCHAIN) $(shell pwd)
 
 build-sandbox:
 	@docker build -f $(SANDBOX_DOCKERFILE) \
-		--build-arg RUSTUP_TOOLCHAIN=${RUST_VERSION} \
-		-t $(NAMESPACE)/$(SANDBOX_IMG):$(RUST_VERSION) $(shell pwd)
+		--build-arg DPDK_VERSION=${DPDK_VERSION} \
+		--build-arg TCPREPLAY_VERSION=${TCPREPLAY_VERSION} \
+		--build-arg RUSTUP_TOOLCHAIN=${RUSTUP_TOOLCHAIN} \
+		-t $(NAMESPACE)/$(SANDBOX_IMG):$(RUSTUP_TOOLCHAIN) $(shell pwd)
 
 build-tcpreplay:
 	@docker build -f $(TCPREPLAY_DOCKERFILE) \
@@ -203,7 +205,7 @@ run:
 		-v /lib/modules:/lib/modules \
 		-v /usr/src:/usr/src \
 		-v /dev/hugepages:/dev/hugepages \
-		-v $(BASE_DIR)/NetBricks:/opt/netbricks \
+		-v $(BASE_DIR)/nb2:/opt/nb2 \
 		-v $(BASE_DIR)/MoonGen:/opt/moongen \
 		$(SANDBOX) /bin/bash
 
